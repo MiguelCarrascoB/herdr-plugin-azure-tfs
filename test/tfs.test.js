@@ -24,3 +24,11 @@ test('client sends auth and handles WIQL, work items, PRs, and threads from a fi
   assert.equal(items.value[0].id, 4); assert.equal(prs[0].pullRequestId, 8); assert.equal(pr.title, 'Fixture PR'); assert.equal(threads.value[0].id, 1);
   assert.equal(requests[0].req.method, 'POST'); assert.equal(requests[0].req.headers.authorization, authHeader('secret')); assert.match(JSON.parse(requests[0].body).query, /@Me/);
 });
+test('picks JSON Patch content type for work item comments and plain JSON for PR comments', async (t) => {
+  const requests = []; const server = http.createServer((req, res) => { let body = ''; req.on('data', x => body += x); req.on('end', () => { requests.push({ req, body }); res.setHeader('content-type', 'application/json'); res.end(JSON.stringify({ id: 1 })); }); });
+  await new Promise(resolve => server.listen(0, resolve)); t.after(() => server.close());
+  const port = server.address().port; const client = new TfsClient({ baseUrl: `http://127.0.0.1:${port}`, collection: 'DefaultCollection', project: 'App', pat: 'secret', apiVersion: '6.0' });
+  await client.commentWorkItem(42, 'a comment'); await client.commentPullRequest(8, 'api', 'a comment');
+  assert.equal(requests[0].req.headers['content-type'], 'application/json-patch+json'); assert.ok(Array.isArray(JSON.parse(requests[0].body)));
+  assert.equal(requests[1].req.headers['content-type'], 'application/json'); assert.equal(Array.isArray(JSON.parse(requests[1].body)), false);
+});
