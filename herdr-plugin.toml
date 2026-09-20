@@ -1,5 +1,6 @@
 id = "miguel.azure-tfs"
 name = "Azure TFS"
+version = "0.1.0"
 min_herdr_version = "0.7.0"
 platforms = ["linux", "macos"]
 
@@ -15,26 +16,28 @@ placement = "popup"
 
 [[actions]]
 id = "dispatch"
-command = "./commands/dispatch.js"
+command = ["node", "./commands/dispatch.js"]
 
 [[actions]]
 id = "report"
-command = "./commands/report.js"
+command = ["node", "./commands/report.js"]
 
 [[actions]]
-id = "preview"
-command = "./commands/preview.js"
+id = "preview-link"
+command = ["node", "./commands/preview.js"]
 
 [[link_handlers]]
+id = "workitem-link"
 pattern = "^https?://[^/]+/[^/]+/[^/]+/_workitems/edit/[0-9]+/?$"
-action = "preview"
+action = "preview-link"
 
 [[link_handlers]]
+id = "pullrequest-link"
 pattern = "^https?://[^/]+/[^/]+/[^/]+/_git/[^/]+/pullrequest/[0-9]+/?$"
-action = "preview"
+action = "preview-link"
 
 [[startup]]
-command = "./commands/startup.js"
+command = ["node", "./commands/startup.js"]
 
 [[build]]
-command = "node --check commands/board.js"
+command = ["node", "--check", "commands/board.js"]
