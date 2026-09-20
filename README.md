@@ -6,6 +6,8 @@ Server 2022 REST API 6.0 and uses a PAT with HTTP Basic authentication.
 
 ## Install and configure
 
+**Prerequisites:** this repository is a plugin for the `herdr` host (the manifest pins `min_herdr_version = "0.7.0"`); herdr itself is not included and must be installed and on your `PATH`. Plugin configuration is read from `$HERDR_PLUGIN_CONFIG_DIR/.env` — if your environment does not already define `HERDR_PLUGIN_CONFIG_DIR`, export it before the commands below.
+
 ```sh
 herdr plugin link /path/to/herdrPlugin
 mkdir -p "$HERDR_PLUGIN_CONFIG_DIR"
