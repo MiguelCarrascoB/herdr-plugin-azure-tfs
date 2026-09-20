@@ -23,7 +23,7 @@ gitignored. `AZURE_TFS_API_VERSION` defaults to `6.0`.
 * **Board:** executes a WIQL query for `@Me` and active work items, then lists
   active pull requests.
 * **Links:** Ctrl+click URLs in the collection/project `_workitems/edit/:id`
-  and `_git/:repo/pullrequest/:id` forms to open a preview.
+  and `_git/:repo/pullrequest/:id` forms to invoke the `preview-link` action.
 * **Dispatch:** the `dispatch` action accepts a work-item id (or gets one from
   `HERDR_PLUGIN_CONTEXT_JSON`) and opens a pane with `opencode --prompt ...`.
   Set `TFS_AGENT_COMMAND` to use another agent command.
@@ -31,6 +31,58 @@ gitignored. `AZURE_TFS_API_VERSION` defaults to `6.0`.
   plugin contract used here, so the minimal fallback is the `report` action.
   Run it with a TFS URL and status text; it adds work-item history or a PR
   thread. This can be called by a local blocked-event bridge.
+
+### Architecture
+
+```mermaid
+flowchart LR
+  host[herdr host] --> manifest[Manifest declarations]
+  manifest --> panes[Panes: board, preview]
+  manifest --> actions[Actions: dispatch, report, preview-link]
+  manifest --> handlers[Link handlers: workitem-link, pullrequest-link]
+  panes --> commands[Commands: board.js, preview.js, dispatch.js, report.js, startup.js]
+  actions --> commands
+  handlers --> commands
+  configSource[HERDR_PLUGIN_CONFIG_DIR/.env] --> config[config.js: .env + TFS settings]
+  commands --> config
+  commands --> herdr[herdr.js: herdr context + pane spawning]
+  commands --> render[render.js: board/preview rendering]
+  commands --> tfs[tfs.js: REST client + URL parsing + auth]
+  tfs --> api[TFS 2022 REST API: WIQL, work items, pull requests, threads]
+  api -. PAT Basic auth .-> tfs
+```
+
+### Data flow
+
+```mermaid
+flowchart TD
+  board[Board pane] --> wiql[WIQL @Me query]
+  wiql --> batch[Work-item batch fetch]
+  board --> prs[Active PR list]
+  batch --> boardRender[renderBoard]
+  prs --> boardRender
+  boardRender --> boardOutput[Board output]
+
+  link[URL matched by link handler] --> parse[parseTfsUrl]
+  parse --> wi[Work-item fetch]
+  wi --> wiRender[renderWorkItem]
+  parse --> pr[Pull-request fetch]
+  pr --> threads[Fetch PR threads]
+  pr --> prRender[renderPr]
+  threads --> prRender
+  wiRender --> popup[Preview popup]
+  prRender --> popup
+
+  report[Report action] --> reportParse[parseTfsUrl]
+  reportParse --> history[Work-item history PATCH]
+  reportParse --> threadPost[PR thread POST]
+```
+
+### Link URL requirements
+
+Link-handler patterns require URLs with the `/tfs` virtual-directory segment
+(`host/tfs/Collection/Project/...`). Servers deployed without `/tfs` will not
+trigger link handling, even though the internal parser can accept them.
 
 ## Tests and mock server
 
