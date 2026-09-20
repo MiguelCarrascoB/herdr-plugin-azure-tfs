@@ -6,34 +6,41 @@ platforms = ["linux", "macos"]
 
 [[panes]]
 id = "board"
-entrypoint = "./commands/board.js"
+title = "Azure TFS board"
+command = ["node", "./commands/board.js"]
 placement = "split"
 
 [[panes]]
 id = "preview"
-entrypoint = "./commands/preview.js"
+title = "Azure TFS preview"
+command = ["node", "./commands/preview.js"]
 placement = "popup"
 
 [[actions]]
 id = "dispatch"
+title = "Azure TFS: dispatch work item"
 command = ["node", "./commands/dispatch.js"]
 
 [[actions]]
 id = "report"
+title = "Azure TFS: report status"
 command = ["node", "./commands/report.js"]
 
 [[actions]]
 id = "preview-link"
+title = "Azure TFS: preview link"
 command = ["node", "./commands/preview.js"]
 
 [[link_handlers]]
 id = "workitem-link"
-pattern = "^https?://[^/]+/[^/]+/[^/]+/_workitems/edit/[0-9]+/?$"
+title = "Azure TFS: work item link"
+pattern = "^https?://[^/]+(?:/[^/]+)?/[^/]+/[^/]+/_workitems/edit/[0-9]+/?$"
 action = "preview-link"
 
 [[link_handlers]]
 id = "pullrequest-link"
-pattern = "^https?://[^/]+/[^/]+/[^/]+/_git/[^/]+/pullrequest/[0-9]+/?$"
+title = "Azure TFS: pull request link"
+pattern = "^https?://[^/]+(?:/[^/]+)?/[^/]+/[^/]+/_git/[^/]+/pullrequest/[0-9]+/?$"
 action = "preview-link"
 
 [[startup]]
