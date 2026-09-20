@@ -1,0 +1,40 @@
+id = "miguel.azure-tfs"
+name = "Azure TFS"
+min_herdr_version = "0.7.0"
+platforms = ["linux", "macos"]
+
+[[panes]]
+id = "board"
+entrypoint = "./commands/board.js"
+placement = "split"
+
+[[panes]]
+id = "preview"
+entrypoint = "./commands/preview.js"
+placement = "popup"
+
+[[actions]]
+id = "dispatch"
+command = "./commands/dispatch.js"
+
+[[actions]]
+id = "report"
+command = "./commands/report.js"
+
+[[actions]]
+id = "preview"
+command = "./commands/preview.js"
+
+[[link_handlers]]
+pattern = "^https?://[^/]+/[^/]+/[^/]+/_workitems/edit/[0-9]+/?$"
+action = "preview"
+
+[[link_handlers]]
+pattern = "^https?://[^/]+/[^/]+/[^/]+/_git/[^/]+/pullrequest/[0-9]+/?$"
+action = "preview"
+
+[[startup]]
+command = "./commands/startup.js"
+
+[[build]]
+command = "node --check commands/board.js"

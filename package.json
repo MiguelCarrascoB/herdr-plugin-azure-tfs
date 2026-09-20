@@ -1,0 +1,8 @@
+{
+  "name": "herdr-plugin-azure-tfs",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Azure TFS Server plugin for herdr",
+  "scripts": { "test": "node --test" },
+  "engines": { "node": ">=18" }
+}
